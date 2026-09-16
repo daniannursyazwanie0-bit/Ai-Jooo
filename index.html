@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>hi luqman</title>
 
 <style>
@@ -13,111 +12,108 @@
 
 body {
     margin: 0;
-    background: #ffffff;
+    background: #09090b;
+    color: #f4f4f5;
     font-family: Arial, sans-serif;
-    color: #111;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .app {
-    width: 100%;
-    max-width: 700px;
     height: 100vh;
-    margin: auto;
     display: flex;
     flex-direction: column;
 }
 
-/* ONLY visible title */
-
 header {
-    padding: 18px 20px;
-    border-bottom: 1px solid #eee;
-    font-size: 18px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #27272a;
+    font-size: 20px;
+    font-weight: 600;
 }
-
-/* chat */
 
 #chat {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .message {
-    max-width: 85%;
-    padding: 10px 14px;
-    margin: 8px 0;
-    border-radius: 16px;
+    max-width: 82%;
+    padding: 12px 15px;
+    border-radius: 18px;
+    line-height: 1.45;
     white-space: pre-wrap;
-    line-height: 1.4;
+    word-wrap: break-word;
 }
 
-.luqman {
-    background: #eeeeee;
+.user {
+    align-self: flex-end;
+    background: #27272a;
+    border-bottom-right-radius: 5px;
 }
 
-.me {
-    background: #111111;
-    color: white;
-    margin-left: auto;
+.ai {
+    align-self: flex-start;
+    background: #18181b;
+    border-bottom-left-radius: 5px;
 }
 
-/* input */
-
-.bottom {
-    border-top: 1px solid #eee;
+.typing {
+    align-self: flex-start;
+    color: #71717a;
     padding: 10px;
+}
+
+footer {
+    border-top: 1px solid #27272a;
+    padding: 12px;
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 textarea {
     flex: 1;
     resize: none;
-    min-height: 45px;
-    max-height: 150px;
-    padding: 11px;
-    border: 1px solid #ddd;
-    border-radius: 14px;
-    font-family: Arial, sans-serif;
+    height: 48px;
+    border: 0;
+    outline: none;
+    border-radius: 16px;
+    padding: 14px;
+    background: #18181b;
+    color: white;
     font-size: 15px;
 }
 
 button {
-    border: none;
-    border-radius: 12px;
-    padding: 10px 15px;
-    background: #111;
-    color: white;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 50%;
+    background: white;
+    color: black;
+    font-size: 20px;
     cursor: pointer;
 }
 
-button:active {
-    transform: scale(.97);
+button:disabled {
+    opacity: 0.4;
 }
 
-/* hidden memory screen */
-
-#memoryScreen {
-    display: none;
+#progress {
     position: fixed;
-    inset: 0;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0%;
     background: white;
-    max-width: 700px;
-    margin: auto;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.memory {
-    border-bottom: 1px solid #eee;
-    padding: 13px 0;
-}
-
-.delete {
-    background: #eee;
-    color: #111;
-    margin-top: 7px;
+    transition: width .2s;
 }
 </style>
 </head>
@@ -126,585 +122,393 @@ button:active {
 
 <div class="app">
 
-<header>
-    hi luqman
-</header>
+<header>hi luqman</header>
 
-<div id="chat"></div>
+<main id="chat"></main>
 
-<div class="bottom">
-
-<textarea
-    id="messageInput"
-    placeholder="..."
-></textarea>
-
-<button onclick="sendMessage()">
-    send
-</button>
+<footer>
+    <textarea id="input" placeholder="..."></textarea>
+    <button id="send">↑</button>
+</footer>
 
 </div>
 
-</div>
+<div id="progress"></div>
 
+<script type="module">
 
-<!--
-    Hidden memory screen.
-    It is NOT shown on the main interface.
--->
+import {
+    CreateMLCEngine
+} from "https://esm.run/@mlc-ai/web-llm";
 
-<div id="memoryScreen">
+const MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
 
-<button onclick="closeMemory()">
-    back
-</button>
+let engine = null;
+let loading = false;
 
-<h2>memory</h2>
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+const progress = document.getElementById("progress");
 
-<div id="memoryList"></div>
+const STORAGE_MESSAGES = "luqman_messages";
+const STORAGE_MEMORIES = "luqman_memories";
 
-</div>
+let messages = JSON.parse(
+    localStorage.getItem(STORAGE_MESSAGES) || "[]"
+);
 
+let memories = JSON.parse(
+    localStorage.getItem(STORAGE_MEMORIES) || "[]"
+);
 
-<script>
-
-/* =========================================================
-   STORAGE
-========================================================= */
-
-const CHAT_KEY = "hi_luqman_chat";
-const MEMORY_KEY = "hi_luqman_memories";
-
-let chatHistory =
-    JSON.parse(localStorage.getItem(CHAT_KEY) || "[]");
-
-let memories =
-    JSON.parse(localStorage.getItem(MEMORY_KEY) || "[]");
-
-
-function saveEverything() {
-
+function saveData() {
     localStorage.setItem(
-        CHAT_KEY,
-        JSON.stringify(chatHistory)
+        STORAGE_MESSAGES,
+        JSON.stringify(messages)
     );
 
     localStorage.setItem(
-        MEMORY_KEY,
+        STORAGE_MEMORIES,
         JSON.stringify(memories)
     );
 }
 
+function addMessage(text, type) {
 
-/* =========================================================
-   YOUR ACTUAL KMKJ SCHEDULE
-========================================================= */
+    const div = document.createElement("div");
 
-const schedule = {
+    div.className = "message " + type;
+    div.textContent = text;
 
-    Monday: [
-        ["08:00", "09:00", "Physics Lecture"],
-        ["09:00", "10:00", "Math Lecture"],
-        ["10:00", "12:00", "Basic Engineering Practical"],
-        ["12:00", "13:00", "Chemistry Lecture"],
-        ["13:00", "14:00", "Break"],
-        ["14:00", "15:00", "Physics Tutorial"],
-        ["15:00", "16:00", "English"]
-    ],
-
-    Tuesday: [
-        ["08:00", "09:00", "Basic Engineering Lecture"],
-        ["09:00", "10:00", "Math Lecture"],
-        ["10:00", "11:00", "Math Tutorial"],
-        ["11:00", "12:00", "PAI"],
-        ["12:00", "14:00", "Break"],
-        ["14:00", "15:00", "Basic Engineering Tutorial"],
-        ["15:00", "16:00", "Pengajian Am"]
-    ],
-
-    Wednesday: [
-        ["08:00", "10:00", "Chemistry Practical"],
-        ["10:00", "11:00", "Free"],
-        ["11:00", "12:00", "Chemistry Tutorial"],
-        ["12:00", "13:00", "English"],
-        ["13:00", "14:00", "Break"],
-        ["14:00", "15:00", "Math Tutorial"],
-        ["15:00", "16:00", "Basic Engineering Tutorial"]
-    ],
-
-    Thursday: [
-        ["08:00", "09:00", "Chemistry Tutorial"],
-        ["09:00", "10:00", "English"],
-        ["10:00", "11:00", "Physics Tutorial"],
-        ["11:00", "12:00", "Basic Engineering Tutorial"],
-        ["12:00", "14:00", "Break"],
-        ["14:00", "16:00", "Physics Practical"]
-    ],
-
-    Friday: [
-        ["08:00", "09:00", "Free"],
-        ["09:00", "10:00", "Math Tutorial"],
-        ["10:00", "11:00", "Chemistry Tutorial"],
-        ["11:00", "12:00", "Physics Tutorial"],
-        ["12:00", "16:00", "Free"]
-    ]
-
-};
-
-
-/* =========================================================
-   TIME FUNCTIONS
-========================================================= */
-
-function toMinutes(time) {
-
-    const parts = time.split(":");
-
-    return (
-        Number(parts[0]) * 60 +
-        Number(parts[1])
-    );
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
 }
 
-
-function currentActivity() {
-
-    const days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday"
-    ];
-
-    const now = new Date();
-
-    const day = days[now.getDay()];
-
-    if (!schedule[day]) {
-
-        return {
-            day: day,
-            activity: "No scheduled class"
-        };
-
-    }
-
-    const current =
-        now.getHours() * 60 +
-        now.getMinutes();
-
-    for (const item of schedule[day]) {
-
-        const start = toMinutes(item[0]);
-        const end = toMinutes(item[1]);
-
-        if (
-            current >= start &&
-            current < end
-        ) {
-
-            return {
-                day: day,
-                activity: item[2],
-                start: item[0],
-                end: item[1]
-            };
-
-        }
-
-    }
-
-    return {
-        day: day,
-        activity: "Outside class schedule"
-    };
-}
-
-
-/* =========================================================
-   CHAT DISPLAY
-========================================================= */
-
-function addMessage(text, sender) {
-
-    const chat =
-        document.getElementById("chat");
-
-    const message =
-        document.createElement("div");
-
-    message.className =
-        "message " + sender;
-
-    message.textContent = text;
-
-    chat.appendChild(message);
-
-    chat.scrollTop =
-        chat.scrollHeight;
-}
-
-
-function renderChat() {
-
-    const chat =
-        document.getElementById("chat");
+function renderHistory() {
 
     chat.innerHTML = "";
 
-    for (const item of chatHistory) {
+    for (const message of messages) {
 
-        addMessage(
-            item.text,
-            item.sender
-        );
+        if (message.role === "luqman") {
+            addMessage(message.content, "user");
+        }
 
+        if (message.role === "ai") {
+            addMessage(message.content, "ai");
+        }
     }
-
 }
 
+renderHistory();
 
-/* =========================================================
-   ADD LUQMAN MESSAGE
-========================================================= */
+async function loadAI() {
 
-function sendMessage() {
+    if (engine || loading) return engine;
 
-    const input =
-        document.getElementById("messageInput");
-
-    const text =
-        input.value.trim();
-
-    if (!text) return;
-
-
-    /*
-        IMPORTANT:
-
-        Anything entered here is treated as
-        something LUQMAN ACTUALLY SAID.
-
-        AI-generated replies are saved separately
-        as "me".
-    */
-
-    const luqmanMessage = {
-
-        sender: "luqman",
-
-        text: text,
-
-        timestamp:
-            new Date().toISOString()
-
-    };
-
-
-    chatHistory.push(luqmanMessage);
-
-    saveEverything();
-
-    addMessage(text, "luqman");
-
-    input.value = "";
-
-
-    /*
-        Send it to the AI backend.
-    */
-
-    generateReply(text);
-
-}
-
-
-/* =========================================================
-   AI REPLY
-========================================================= */
-
-async function generateReply(luqmanText) {
-
-    const activity =
-        currentActivity();
-
-
-    const context = {
-
-        luqman_message: luqmanText,
-
-        current_time:
-            new Date().toLocaleString("en-MY"),
-
-        current_schedule:
-            activity,
-
-        memories:
-            memories,
-
-        recent_conversation:
-            chatHistory.slice(-30)
-
-    };
-
+    loading = true;
+    send.disabled = true;
 
     try {
 
-        const response =
-            await fetch("/api/reply", {
+        engine = await CreateMLCEngine(
+            MODEL,
+            {
+                initProgressCallback: (report) => {
 
-                method: "POST",
+                    if (
+                        typeof report.progress === "number"
+                    ) {
+                        progress.style.width =
+                            Math.round(
+                                report.progress * 100
+                            ) + "%";
+                    }
+                }
+            }
+        );
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+        progress.style.width = "0%";
+        send.disabled = false;
 
-                body:
-                    JSON.stringify(context)
-
-            });
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "AI server unavailable"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        /*
-            ONLY save a memory if the AI says
-            Luqman actually stated something
-            worth remembering.
-        */
-
-        if (
-            data.memory &&
-            data.memory.trim()
-        ) {
-
-            memories.push({
-
-                text: data.memory,
-
-                source: "Luqman",
-
-                timestamp:
-                    new Date().toISOString()
-
-            });
-
-        }
-
-
-        if (data.reply) {
-
-            const reply = {
-
-                sender: "me",
-
-                text: data.reply,
-
-                timestamp:
-                    new Date().toISOString()
-
-            };
-
-
-            chatHistory.push(reply);
-
-            addMessage(
-                data.reply,
-                "me"
-            );
-
-        }
-
-
-        saveEverything();
-
+        return engine;
 
     } catch (error) {
 
-        /*
-            Don't pretend an AI response exists
-            when the backend isn't connected.
-        */
+        console.error(error);
 
-        addMessage(
-            "ai not connected rn 😭",
-            "me"
+        progress.style.width = "0%";
+        loading = false;
+        send.disabled = false;
+
+        alert(
+            "AI couldn't start on this browser/device. Check the browser console for the error."
         );
 
+        throw error;
     }
-
 }
 
+const SYSTEM_PROMPT = `
+You are an AI that helps the user reply naturally to Luqman.
 
-/* =========================================================
-   MEMORY
-========================================================= */
+IMPORTANT:
+The user is NOT currently dating Luqman.
+They are close friends.
+Do not automatically make replies romantic, couple-like, flirty, or sexual.
 
-function showMemory() {
+Luqman is a teacher.
 
-    const screen =
-        document.getElementById(
-            "memoryScreen"
-        );
+The user's texting style:
+- casual
+- short
+- Malay-English mixed
+- uses slang and abbreviations
+- sometimes chaotic/random
+- uses hahaha/HAHAHA naturally
+- uses emojis sometimes
+- not overly polished
+- not cringe
+- not formal
+- not constantly flirty
+- sounds like a real Malaysian student texting a close friend
 
-    screen.style.display =
-        "block";
+The user wants replies that sound like HER, not like an AI.
 
+The user's weekly KMKJ schedule:
 
-    const list =
-        document.getElementById(
-            "memoryList"
-        );
+Monday:
+8-9 Physics
+9-10 Math
+10-12 Basic Engineering
+12-1 Chemistry
+2-3 Physics
+3-4 English
 
-    list.innerHTML = "";
+Tuesday:
+8-9 Basic Engineering
+9-10 Math
+10-11 Math tutorial
+11-12 PAI
+2-3 Basic Engineering
+3-4 Pengajian Am
 
+Wednesday:
+8-10 Chemistry practical
+11-12 Chemistry tutorial
+12-1 English
+2-3 Math tutorial
+3-4 Basic Engineering tutorial
 
-    if (!memories.length) {
+Thursday:
+8-9 Chemistry tutorial
+9-10 English
+10-11 Physics tutorial
+11-12 Basic Engineering tutorial
+2-4 Physics practical
 
-        list.textContent =
-            "nothing saved yet";
+Friday:
+9-10 Math tutorial
+10-11 Chemistry tutorial
+11-12 Physics tutorial
 
-        return;
+Use this schedule only when it naturally matters.
 
-    }
+MEMORY RULE:
+Only remember facts that Luqman actually tells the user.
+Do not invent memories.
+Do not treat the user's own statements as things Luqman said.
+Do not save temporary/random messages as permanent memories.
 
+When replying, output EXACTLY:
 
-    memories.forEach(
-        (memory, index) => {
+REPLY:
+<the natural reply>
 
-            const div =
-                document.createElement("div");
+MEMORY:
+<one useful fact Luqman said, or NONE>
 
-            div.className =
-                "memory";
+Do not add anything else.
+`;
 
+function getRecentHistory() {
 
-            const text =
-                document.createElement("div");
+    return messages
+        .slice(-30)
+        .map(m => {
 
-            text.textContent =
-                memory.text;
-
-
-            const source =
-                document.createElement("div");
-
-            source.style.fontSize =
-                "12px";
-
-            source.style.color =
-                "#777";
-
-            source.textContent =
-                "actually said by Luqman";
-
-
-            const deleteButton =
-                document.createElement("button");
-
-            deleteButton.className =
-                "delete";
-
-            deleteButton.textContent =
-                "delete";
-
-
-            deleteButton.onclick =
-                function () {
-
-                    memories.splice(
-                        index,
-                        1
-                    );
-
-                    saveEverything();
-
-                    showMemory();
-
-                };
-
-
-            div.appendChild(text);
-
-            div.appendChild(source);
-
-            div.appendChild(deleteButton);
-
-            list.appendChild(div);
-
-        }
-    );
-
-}
-
-
-function closeMemory() {
-
-    document.getElementById(
-        "memoryScreen"
-    ).style.display = "none";
-
-}
-
-
-/* =========================================================
-   SECRET MEMORY ACCESS
-   Double-click the title.
-========================================================= */
-
-document
-    .querySelector("header")
-    .addEventListener(
-        "dblclick",
-        showMemory
-    );
-
-
-/* =========================================================
-   ENTER TO SEND
-========================================================= */
-
-document
-    .getElementById("messageInput")
-    .addEventListener(
-        "keydown",
-        function(event) {
-
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
-
-                event.preventDefault();
-
-                sendMessage();
-
+            if (m.role === "luqman") {
+                return "Luqman: " + m.content;
             }
 
+            return "User reply: " + m.content;
+
+        })
+        .join("\n");
+}
+
+async function generateReply(luqmanMessage) {
+
+    const ai = await loadAI();
+
+    const prompt = `
+${SYSTEM_PROMPT}
+
+KNOWN MEMORIES:
+${memories.join("\n") || "None"}
+
+RECENT CHAT:
+${getRecentHistory()}
+
+NEW MESSAGE FROM LUQMAN:
+${luqmanMessage}
+
+Generate the user's natural reply now.
+`;
+
+    const response =
+        await ai.chat.completions.create({
+
+            messages: [
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+
+            temperature: 0.85,
+
+            max_tokens: 180
+        });
+
+    return response.choices[0].message.content.trim();
+}
+
+function parseAI(output) {
+
+    let reply = output;
+    let memory = null;
+
+    const replyMatch =
+        output.match(
+            /REPLY:\s*([\s\S]*?)(?=\nMEMORY:|$)/i
+        );
+
+    const memoryMatch =
+        output.match(
+            /MEMORY:\s*([\s\S]*)$/i
+        );
+
+    if (replyMatch) {
+        reply = replyMatch[1].trim();
+    }
+
+    if (memoryMatch) {
+        memory = memoryMatch[1].trim();
+    }
+
+    if (
+        memory &&
+        memory !== "NONE" &&
+        memory.length > 2
+    ) {
+
+        if (!memories.includes(memory)) {
+            memories.push(memory);
         }
-    );
 
+        // Keep memory reasonably small.
+        if (memories.length > 100) {
+            memories = memories.slice(-100);
+        }
+    }
 
-/* =========================================================
-   START
-========================================================= */
+    return {
+        reply,
+        memory
+    };
+}
 
-renderChat();
+async function sendMessage() {
+
+    const text = input.value.trim();
+
+    if (!text || loading) return;
+
+    input.value = "";
+
+    messages.push({
+        role: "luqman",
+        content: text
+    });
+
+    addMessage(text, "user");
+    saveData();
+
+    const typing =
+        document.createElement("div");
+
+    typing.className = "typing";
+    typing.textContent = "•••";
+
+    chat.appendChild(typing);
+    chat.scrollTop = chat.scrollHeight;
+
+    try {
+
+        const raw =
+            await generateReply(text);
+
+        const result =
+            parseAI(raw);
+
+        typing.remove();
+
+        addMessage(
+            result.reply,
+            "ai"
+        );
+
+        messages.push({
+            role: "ai",
+            content: result.reply
+        });
+
+        saveData();
+
+    } catch (error) {
+
+        console.error(error);
+
+        typing.remove();
+
+        addMessage(
+            "AI error 😭 check console",
+            "ai"
+        );
+    }
+}
+
+send.addEventListener(
+    "click",
+    sendMessage
+);
+
+input.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+            sendMessage();
+        }
+    }
+);
 
 </script>
 
