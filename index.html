@@ -4,163 +4,121 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AI Me</title>
+<title>hi luqman</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        color: #222;
-    }
+body {
+    margin: 0;
+    background: #ffffff;
+    font-family: Arial, sans-serif;
+    color: #111;
+}
 
-    .app {
-        max-width: 600px;
-        margin: auto;
-        min-height: 100vh;
-        background: white;
-        display: flex;
-        flex-direction: column;
-    }
+.app {
+    width: 100%;
+    max-width: 700px;
+    height: 100vh;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+}
 
-    header {
-        padding: 18px;
-        background: #222;
-        color: white;
-    }
+/* ONLY visible title */
 
-    header h1 {
-        margin: 0;
-        font-size: 22px;
-    }
+header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #eee;
+    font-size: 18px;
+}
 
-    header p {
-        margin: 5px 0 0;
-        opacity: .7;
-        font-size: 13px;
-    }
+/* chat */
 
-    .chat {
-        flex: 1;
-        padding: 15px;
-        overflow-y: auto;
-    }
+#chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
 
-    .message {
-        margin-bottom: 12px;
-        padding: 11px 14px;
-        border-radius: 15px;
-        max-width: 85%;
-        line-height: 1.4;
-        white-space: pre-wrap;
-    }
+.message {
+    max-width: 85%;
+    padding: 10px 14px;
+    margin: 8px 0;
+    border-radius: 16px;
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
 
-    .user {
-        margin-left: auto;
-        background: #222;
-        color: white;
-        border-bottom-right-radius: 4px;
-    }
+.luqman {
+    background: #eeeeee;
+}
 
-    .ai {
-        margin-right: auto;
-        background: #eee;
-        border-bottom-left-radius: 4px;
-    }
+.me {
+    background: #111111;
+    color: white;
+    margin-left: auto;
+}
 
-    .quick-buttons {
-        display: flex;
-        gap: 7px;
-        overflow-x: auto;
-        padding: 8px 12px;
-    }
+/* input */
 
-    button {
-        border: none;
-        padding: 9px 13px;
-        border-radius: 20px;
-        cursor: pointer;
-        background: #ddd;
-        white-space: nowrap;
-    }
+.bottom {
+    border-top: 1px solid #eee;
+    padding: 10px;
+    display: flex;
+    gap: 8px;
+}
 
-    button:hover {
-        background: #ccc;
-    }
+textarea {
+    flex: 1;
+    resize: none;
+    min-height: 45px;
+    max-height: 150px;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+}
 
-    .input-area {
-        display: flex;
-        gap: 8px;
-        padding: 12px;
-        border-top: 1px solid #ddd;
-    }
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 15px;
+    background: #111;
+    color: white;
+    cursor: pointer;
+}
 
-    textarea {
-        flex: 1;
-        resize: none;
-        border: 1px solid #ccc;
-        border-radius: 12px;
-        padding: 11px;
-        font-family: inherit;
-        min-height: 45px;
-    }
+button:active {
+    transform: scale(.97);
+}
 
-    .send {
-        background: #222;
-        color: white;
-        border-radius: 12px;
-        padding: 0 17px;
-    }
+/* hidden memory screen */
 
-    .schedule {
-        padding: 15px;
-        display: none;
-        overflow-y: auto;
-    }
+#memoryScreen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: white;
+    max-width: 700px;
+    margin: auto;
+    padding: 20px;
+    overflow-y: auto;
+}
 
-    .schedule h2 {
-        margin-top: 0;
-    }
+.memory {
+    border-bottom: 1px solid #eee;
+    padding: 13px 0;
+}
 
-    .day {
-        margin-bottom: 18px;
-    }
-
-    .day h3 {
-        margin-bottom: 7px;
-    }
-
-    .class {
-        padding: 9px;
-        background: #f1f1f1;
-        border-radius: 9px;
-        margin-bottom: 5px;
-        font-size: 13px;
-    }
-
-    .free {
-        background: #e7f7e7;
-    }
-
-    .nav {
-        display: flex;
-        border-top: 1px solid #ddd;
-    }
-
-    .nav button {
-        flex: 1;
-        border-radius: 0;
-        background: white;
-        padding: 13px;
-    }
-
-    .active {
-        font-weight: bold;
-    }
+.delete {
+    background: #eee;
+    color: #111;
+    margin-top: 7px;
+}
 </style>
 </head>
 
@@ -169,150 +127,147 @@
 <div class="app">
 
 <header>
-    <h1>AI Me</h1>
-    <p>basically me but coded 💀</p>
+    hi luqman
 </header>
 
-<div id="chat" class="chat">
+<div id="chat"></div>
 
-    <div class="message ai">
-        okay what happened 😭
-    </div>
+<div class="bottom">
 
-</div>
+<textarea
+    id="messageInput"
+    placeholder="..."
+></textarea>
 
-<div id="schedule" class="schedule">
-
-    <h2>My Schedule</h2>
-
-    <div class="day">
-        <h3>Monday</h3>
-        <div class="class">8–9 AM — Physics Lecture</div>
-        <div class="class">9–10 AM — Math Lecture</div>
-        <div class="class">10 AM–12 PM — Basic Engineering Practical</div>
-        <div class="class">12–1 PM — Chemistry Lecture</div>
-        <div class="class free">1–2 PM — BREAK</div>
-        <div class="class">2–3 PM — Physics Tutorial</div>
-        <div class="class">3–4 PM — English</div>
-    </div>
-
-    <div class="day">
-        <h3>Tuesday</h3>
-        <div class="class">8–9 AM — Basic Engineering Lecture</div>
-        <div class="class">9–10 AM — Math Lecture</div>
-        <div class="class">10–11 AM — Math Tutorial</div>
-        <div class="class">11 AM–12 PM — PAI</div>
-        <div class="class free">12–2 PM — BREAK</div>
-        <div class="class">2–3 PM — Basic Engineering Tutorial</div>
-        <div class="class">3–4 PM — Pengajian Am</div>
-    </div>
-
-    <div class="day">
-        <h3>Wednesday</h3>
-        <div class="class">8–10 AM — Chemistry Practical</div>
-        <div class="class free">10–11 AM — FREE</div>
-        <div class="class">11 AM–12 PM — Chemistry Tutorial</div>
-        <div class="class">12–1 PM — English</div>
-        <div class="class free">1–2 PM — BREAK</div>
-        <div class="class">2–3 PM — Math Tutorial</div>
-        <div class="class">3–4 PM — Basic Engineering Tutorial</div>
-    </div>
-
-    <div class="day">
-        <h3>Thursday</h3>
-        <div class="class">8–9 AM — Chemistry Tutorial</div>
-        <div class="class">9–10 AM — English</div>
-        <div class="class">10–11 AM — Physics Tutorial</div>
-        <div class="class">11 AM–12 PM — Basic Engineering Tutorial</div>
-        <div class="class free">12–2 PM — BREAK</div>
-        <div class="class">2–4 PM — Physics Practical</div>
-    </div>
-
-    <div class="day">
-        <h3>Friday</h3>
-        <div class="class free">8–9 AM — FREE</div>
-        <div class="class">9–10 AM — Math Tutorial</div>
-        <div class="class">10–11 AM — Chemistry Tutorial</div>
-        <div class="class">11 AM–12 PM — Physics Tutorial</div>
-        <div class="class free">12–4 PM — FREE</div>
-    </div>
+<button onclick="sendMessage()">
+    send
+</button>
 
 </div>
 
-<div class="quick-buttons">
-    <button onclick="quick('What am I doing right now?')">what am I doing rn</button>
-    <button onclick="quick('What should I reply to Luqman?')">reply to Luqman</button>
-    <button onclick="quick('Am I busy today?')">am I busy</button>
-    <button onclick="quick('Make this sound like me')">make it sound like me</button>
 </div>
 
-<div class="input-area">
-    <textarea id="input" placeholder="say something..."></textarea>
-    <button class="send" onclick="send()">send</button>
+
+<!--
+    Hidden memory screen.
+    It is NOT shown on the main interface.
+-->
+
+<div id="memoryScreen">
+
+<button onclick="closeMemory()">
+    back
+</button>
+
+<h2>memory</h2>
+
+<div id="memoryList"></div>
+
 </div>
 
-<div class="nav">
-    <button class="active" onclick="showChat()">💬 Chat</button>
-    <button onclick="showSchedule()">📅 Schedule</button>
-</div>
-
-</div>
 
 <script>
 
+/* =========================================================
+   STORAGE
+========================================================= */
+
+const CHAT_KEY = "hi_luqman_chat";
+const MEMORY_KEY = "hi_luqman_memories";
+
+let chatHistory =
+    JSON.parse(localStorage.getItem(CHAT_KEY) || "[]");
+
+let memories =
+    JSON.parse(localStorage.getItem(MEMORY_KEY) || "[]");
+
+
+function saveEverything() {
+
+    localStorage.setItem(
+        CHAT_KEY,
+        JSON.stringify(chatHistory)
+    );
+
+    localStorage.setItem(
+        MEMORY_KEY,
+        JSON.stringify(memories)
+    );
+}
+
+
+/* =========================================================
+   YOUR ACTUAL KMKJ SCHEDULE
+========================================================= */
+
 const schedule = {
+
     Monday: [
-        ["08:00","09:00","Physics Lecture"],
-        ["09:00","10:00","Math Lecture"],
-        ["10:00","12:00","Basic Engineering Practical"],
-        ["12:00","13:00","Chemistry Lecture"],
-        ["13:00","14:00","BREAK"],
-        ["14:00","15:00","Physics Tutorial"],
-        ["15:00","16:00","English"]
+        ["08:00", "09:00", "Physics Lecture"],
+        ["09:00", "10:00", "Math Lecture"],
+        ["10:00", "12:00", "Basic Engineering Practical"],
+        ["12:00", "13:00", "Chemistry Lecture"],
+        ["13:00", "14:00", "Break"],
+        ["14:00", "15:00", "Physics Tutorial"],
+        ["15:00", "16:00", "English"]
     ],
 
     Tuesday: [
-        ["08:00","09:00","Basic Engineering Lecture"],
-        ["09:00","10:00","Math Lecture"],
-        ["10:00","11:00","Math Tutorial"],
-        ["11:00","12:00","PAI"],
-        ["12:00","14:00","BREAK"],
-        ["14:00","15:00","Basic Engineering Tutorial"],
-        ["15:00","16:00","Pengajian Am"]
+        ["08:00", "09:00", "Basic Engineering Lecture"],
+        ["09:00", "10:00", "Math Lecture"],
+        ["10:00", "11:00", "Math Tutorial"],
+        ["11:00", "12:00", "PAI"],
+        ["12:00", "14:00", "Break"],
+        ["14:00", "15:00", "Basic Engineering Tutorial"],
+        ["15:00", "16:00", "Pengajian Am"]
     ],
 
     Wednesday: [
-        ["08:00","10:00","Chemistry Practical"],
-        ["10:00","11:00","FREE"],
-        ["11:00","12:00","Chemistry Tutorial"],
-        ["12:00","13:00","English"],
-        ["13:00","14:00","BREAK"],
-        ["14:00","15:00","Math Tutorial"],
-        ["15:00","16:00","Basic Engineering Tutorial"]
+        ["08:00", "10:00", "Chemistry Practical"],
+        ["10:00", "11:00", "Free"],
+        ["11:00", "12:00", "Chemistry Tutorial"],
+        ["12:00", "13:00", "English"],
+        ["13:00", "14:00", "Break"],
+        ["14:00", "15:00", "Math Tutorial"],
+        ["15:00", "16:00", "Basic Engineering Tutorial"]
     ],
 
     Thursday: [
-        ["08:00","09:00","Chemistry Tutorial"],
-        ["09:00","10:00","English"],
-        ["10:00","11:00","Physics Tutorial"],
-        ["11:00","12:00","Basic Engineering Tutorial"],
-        ["12:00","14:00","BREAK"],
-        ["14:00","16:00","Physics Practical"]
+        ["08:00", "09:00", "Chemistry Tutorial"],
+        ["09:00", "10:00", "English"],
+        ["10:00", "11:00", "Physics Tutorial"],
+        ["11:00", "12:00", "Basic Engineering Tutorial"],
+        ["12:00", "14:00", "Break"],
+        ["14:00", "16:00", "Physics Practical"]
     ],
 
     Friday: [
-        ["08:00","09:00","FREE"],
-        ["09:00","10:00","Math Tutorial"],
-        ["10:00","11:00","Chemistry Tutorial"],
-        ["11:00","12:00","Physics Tutorial"],
-        ["12:00","16:00","FREE"]
+        ["08:00", "09:00", "Free"],
+        ["09:00", "10:00", "Math Tutorial"],
+        ["10:00", "11:00", "Chemistry Tutorial"],
+        ["11:00", "12:00", "Physics Tutorial"],
+        ["12:00", "16:00", "Free"]
     ]
+
 };
 
 
-function getCurrentClass() {
+/* =========================================================
+   TIME FUNCTIONS
+========================================================= */
 
-    const now = new Date();
+function toMinutes(time) {
+
+    const parts = time.split(":");
+
+    return (
+        Number(parts[0]) * 60 +
+        Number(parts[1])
+    );
+}
+
+
+function currentActivity() {
 
     const days = [
         "Sunday",
@@ -324,199 +279,432 @@ function getCurrentClass() {
         "Saturday"
     ];
 
-    const today = days[now.getDay()];
+    const now = new Date();
 
-    if (!schedule[today]) {
-        return "no class today 😭";
+    const day = days[now.getDay()];
+
+    if (!schedule[day]) {
+
+        return {
+            day: day,
+            activity: "No scheduled class"
+        };
+
     }
 
-    const currentMinutes =
-        now.getHours() * 60 + now.getMinutes();
+    const current =
+        now.getHours() * 60 +
+        now.getMinutes();
 
-    for (const item of schedule[today]) {
+    for (const item of schedule[day]) {
 
-        const start = timeToMinutes(item[0]);
-        const end = timeToMinutes(item[1]);
+        const start = toMinutes(item[0]);
+        const end = toMinutes(item[1]);
 
-        if (currentMinutes >= start && currentMinutes < end) {
+        if (
+            current >= start &&
+            current < end
+        ) {
 
-            if (
-                item[2] === "FREE" ||
-                item[2] === "BREAK"
-            ) {
-                return `you're free rn 😭 (${item[2].toLowerCase()})`;
-            }
+            return {
+                day: day,
+                activity: item[2],
+                start: item[0],
+                end: item[1]
+            };
 
-            return `you're in ${item[2]} rn`;
         }
+
     }
 
-    return "class is over for today 👍";
+    return {
+        day: day,
+        activity: "Outside class schedule"
+    };
 }
 
 
-function timeToMinutes(time) {
+/* =========================================================
+   CHAT DISPLAY
+========================================================= */
 
-    const [h,m] = time.split(":").map(Number);
+function addMessage(text, sender) {
 
-    return h * 60 + m;
-}
+    const chat =
+        document.getElementById("chat");
 
+    const message =
+        document.createElement("div");
 
-function addMessage(text, type) {
-
-    const chat = document.getElementById("chat");
-
-    const message = document.createElement("div");
-
-    message.className = "message " + type;
+    message.className =
+        "message " + sender;
 
     message.textContent = text;
 
     chat.appendChild(message);
 
-    chat.scrollTop = chat.scrollHeight;
+    chat.scrollTop =
+        chat.scrollHeight;
 }
 
 
-function quick(text) {
+function renderChat() {
 
-    document.getElementById("input").value = text;
+    const chat =
+        document.getElementById("chat");
 
-    send();
+    chat.innerHTML = "";
+
+    for (const item of chatHistory) {
+
+        addMessage(
+            item.text,
+            item.sender
+        );
+
+    }
+
 }
 
 
-function send() {
+/* =========================================================
+   ADD LUQMAN MESSAGE
+========================================================= */
 
-    const input = document.getElementById("input");
+function sendMessage() {
 
-    const text = input.value.trim();
+    const input =
+        document.getElementById("messageInput");
+
+    const text =
+        input.value.trim();
 
     if (!text) return;
 
-    addMessage(text, "user");
+
+    /*
+        IMPORTANT:
+
+        Anything entered here is treated as
+        something LUQMAN ACTUALLY SAID.
+
+        AI-generated replies are saved separately
+        as "me".
+    */
+
+    const luqmanMessage = {
+
+        sender: "luqman",
+
+        text: text,
+
+        timestamp:
+            new Date().toISOString()
+
+    };
+
+
+    chatHistory.push(luqmanMessage);
+
+    saveEverything();
+
+    addMessage(text, "luqman");
 
     input.value = "";
 
-    setTimeout(() => {
 
-        const reply = generateReply(text);
+    /*
+        Send it to the AI backend.
+    */
 
-        addMessage(reply, "ai");
+    generateReply(text);
 
-    }, 300);
 }
 
 
-function generateReply(text) {
+/* =========================================================
+   AI REPLY
+========================================================= */
 
-    const lower = text.toLowerCase();
+async function generateReply(luqmanText) {
 
-    // CURRENT SCHEDULE
-
-    if (
-        lower.includes("right now") ||
-        lower.includes("doing rn") ||
-        lower.includes("doing right now")
-    ) {
-        return getCurrentClass();
-    }
+    const activity =
+        currentActivity();
 
 
-    // BUSY
+    const context = {
 
-    if (
-        lower.includes("busy today") ||
-        lower.includes("am i busy")
-    ) {
+        luqman_message: luqmanText,
 
-        const now = new Date();
+        current_time:
+            new Date().toLocaleString("en-MY"),
 
-        const dayNames = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday"
-        ];
+        current_schedule:
+            activity,
 
-        const today = dayNames[now.getDay()];
+        memories:
+            memories,
 
-        if (!schedule[today]) {
-            return "no classes today 😭";
+        recent_conversation:
+            chatHistory.slice(-30)
+
+    };
+
+
+    try {
+
+        const response =
+            await fetch("/api/reply", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify(context)
+
+            });
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "AI server unavailable"
+            );
+
         }
 
-        return `yeah you're pretty busy today 💀 it's ${today}`;
+
+        const data =
+            await response.json();
+
+
+        /*
+            ONLY save a memory if the AI says
+            Luqman actually stated something
+            worth remembering.
+        */
+
+        if (
+            data.memory &&
+            data.memory.trim()
+        ) {
+
+            memories.push({
+
+                text: data.memory,
+
+                source: "Luqman",
+
+                timestamp:
+                    new Date().toISOString()
+
+            });
+
+        }
+
+
+        if (data.reply) {
+
+            const reply = {
+
+                sender: "me",
+
+                text: data.reply,
+
+                timestamp:
+                    new Date().toISOString()
+
+            };
+
+
+            chatHistory.push(reply);
+
+            addMessage(
+                data.reply,
+                "me"
+            );
+
+        }
+
+
+        saveEverything();
+
+
+    } catch (error) {
+
+        /*
+            Don't pretend an AI response exists
+            when the backend isn't connected.
+        */
+
+        addMessage(
+            "ai not connected rn 😭",
+            "me"
+        );
+
     }
 
-
-    // LUQMAN REPLY
-
-    if (
-        lower.includes("reply to luqman") ||
-        lower.includes("what should i reply")
-    ) {
-
-        return `send me what he said first 😭
-
-then i'll make the reply sound like you, not some cringe AI shit`;
-    }
-
-
-    // STYLE
-
-    if (
-        lower.includes("sound like me") ||
-        lower.includes("make it sound like me")
-    ) {
-
-        return `short + casual + Malay/English + slightly chaotic 😭
-
-not formal
-not cringe
-not suddenly romantic
-
-basically something you'd actually type`;
-    }
-
-
-    // GENERIC
-
-    if (
-        lower.includes("hello") ||
-        lower === "hi" ||
-        lower === "hey"
-    ) {
-        return "g 😭";
-    }
-
-
-    if (lower.includes("fuck you")) {
-        return "HAHAHA okay bro 😭";
-    }
-
-
-    return "okay but give me more context 😭";
 }
 
 
-function showChat() {
+/* =========================================================
+   MEMORY
+========================================================= */
 
-    document.getElementById("chat").style.display = "block";
+function showMemory() {
 
-    document.getElementById("schedule").style.display = "none";
+    const screen =
+        document.getElementById(
+            "memoryScreen"
+        );
+
+    screen.style.display =
+        "block";
+
+
+    const list =
+        document.getElementById(
+            "memoryList"
+        );
+
+    list.innerHTML = "";
+
+
+    if (!memories.length) {
+
+        list.textContent =
+            "nothing saved yet";
+
+        return;
+
+    }
+
+
+    memories.forEach(
+        (memory, index) => {
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "memory";
+
+
+            const text =
+                document.createElement("div");
+
+            text.textContent =
+                memory.text;
+
+
+            const source =
+                document.createElement("div");
+
+            source.style.fontSize =
+                "12px";
+
+            source.style.color =
+                "#777";
+
+            source.textContent =
+                "actually said by Luqman";
+
+
+            const deleteButton =
+                document.createElement("button");
+
+            deleteButton.className =
+                "delete";
+
+            deleteButton.textContent =
+                "delete";
+
+
+            deleteButton.onclick =
+                function () {
+
+                    memories.splice(
+                        index,
+                        1
+                    );
+
+                    saveEverything();
+
+                    showMemory();
+
+                };
+
+
+            div.appendChild(text);
+
+            div.appendChild(source);
+
+            div.appendChild(deleteButton);
+
+            list.appendChild(div);
+
+        }
+    );
+
 }
 
 
-function showSchedule() {
+function closeMemory() {
 
-    document.getElementById("chat").style.display = "none";
+    document.getElementById(
+        "memoryScreen"
+    ).style.display = "none";
 
-    document.getElementById("schedule").style.display = "block";
 }
+
+
+/* =========================================================
+   SECRET MEMORY ACCESS
+   Double-click the title.
+========================================================= */
+
+document
+    .querySelector("header")
+    .addEventListener(
+        "dblclick",
+        showMemory
+    );
+
+
+/* =========================================================
+   ENTER TO SEND
+========================================================= */
+
+document
+    .getElementById("messageInput")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   START
+========================================================= */
+
+renderChat();
 
 </script>
 
